@@ -21,7 +21,7 @@ def print_response(title: str, response: requests.Response):
     print(f"Status: {response.status_code}")
     try:
         print(json.dumps(response.json(), indent=2))
-    except:
+    except Exception:
         print(response.text)
 
 

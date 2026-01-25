@@ -6,7 +6,7 @@ Provides LLaMA-powered wellness guidance with strict consent enforcement.
 from fastapi import APIRouter, HTTPException, status
 from app.models.schemas import WellnessRequest, WellnessResponse, ConsentType
 from app.services import consent_manager, llama_service
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 logger = logging.getLogger(__name__)
@@ -67,7 +67,7 @@ async def get_wellness_guidance(request: WellnessRequest) -> WellnessResponse:
             guidance=guidance,
             context_used=request.context is not None,
             consent_verified=True,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
         
         logger.info(

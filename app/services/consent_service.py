@@ -3,7 +3,7 @@ Consent Management Service - Regulation Before Reasoning.
 Enforces consent-before-computation at every layer.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 from app.models.schemas import ConsentType, ConsentStatus, ConsentResponse
 from app.config import settings
@@ -49,7 +49,7 @@ class ConsentManager:
         Returns:
             ConsentResponse with granted status and expiry
         """
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         expires_at = now + timedelta(hours=settings.consent_expiry_hours)
         
         consent_response = ConsentResponse(
@@ -111,7 +111,7 @@ class ConsentManager:
         consent = self._consents[user_id][consent_type]
         
         # Check if expired
-        if consent.expires_at and datetime.utcnow() > consent.expires_at:
+        if consent.expires_at and datetime.now(timezone.utc) > consent.expires_at:
             logger.warning(
                 f"Consent expired: user={user_id}, type={consent_type}, "
                 f"expired_at={consent.expires_at}"
