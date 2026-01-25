@@ -19,9 +19,18 @@ class ConsentManager:
     """
     
     def __init__(self):
-        """Initialize consent storage (in-memory for demo, use DB in production)."""
+        """
+        Initialize consent storage (in-memory for demo, use DB in production).
+        
+        WARNING: In-memory storage means all consent data is lost on restart.
+        For production, replace with a persistent database (PostgreSQL, Redis, etc.)
+        """
         self._consents: Dict[str, Dict[ConsentType, ConsentResponse]] = {}
         logger.info("ConsentManager initialized with strict enforcement enabled")
+        logger.warning(
+            "Using in-memory consent storage. Consent data will be lost on restart. "
+            "For production, implement persistent storage."
+        )
     
     def grant_consent(
         self, 

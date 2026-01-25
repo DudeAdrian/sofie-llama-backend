@@ -9,6 +9,7 @@ Key Principles:
 - Modular: Clean separation of concerns for easy extension
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
@@ -22,6 +23,31 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager for startup and shutdown events.
+    """
+    # Startup
+    logger.info("=" * 60)
+    logger.info("S.O.F.I.E. Wellness Backend Starting")
+    logger.info("=" * 60)
+    logger.info(f"Environment: {settings.environment}")
+    logger.info(f"Consent Enforcement: {'ENABLED' if settings.require_consent else 'DISABLED'}")
+    logger.info(f"LLaMA Model: {settings.llama_model_path}")
+    logger.info(f"CORS Origins: {settings.allowed_origins}")
+    logger.info("=" * 60)
+    logger.info("API Documentation available at:")
+    logger.info(f"  - Swagger UI: http://{settings.host}:{settings.port}/docs")
+    logger.info(f"  - ReDoc: http://{settings.host}:{settings.port}/redoc")
+    logger.info("=" * 60)
+    
+    yield
+    
+    # Shutdown
+    logger.info("S.O.F.I.E. Wellness Backend Shutting Down")
 
 
 def create_app() -> FastAPI:
@@ -39,7 +65,8 @@ def create_app() -> FastAPI:
         ),
         version="1.0.0",
         docs_url="/docs",
-        redoc_url="/redoc"
+        redoc_url="/redoc",
+        lifespan=lifespan
     )
     
     # Add CORS middleware for web clients
@@ -59,27 +86,6 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(consent.router)
     app.include_router(wellness.router)
-    
-    @app.on_event("startup")
-    async def startup_event():
-        """Log startup information."""
-        logger.info("=" * 60)
-        logger.info("S.O.F.I.E. Wellness Backend Starting")
-        logger.info("=" * 60)
-        logger.info(f"Environment: {settings.environment}")
-        logger.info(f"Consent Enforcement: {'ENABLED' if settings.require_consent else 'DISABLED'}")
-        logger.info(f"LLaMA Model: {settings.llama_model_path}")
-        logger.info(f"CORS Origins: {settings.allowed_origins}")
-        logger.info("=" * 60)
-        logger.info("API Documentation available at:")
-        logger.info(f"  - Swagger UI: http://{settings.host}:{settings.port}/docs")
-        logger.info(f"  - ReDoc: http://{settings.host}:{settings.port}/redoc")
-        logger.info("=" * 60)
-    
-    @app.on_event("shutdown")
-    async def shutdown_event():
-        """Log shutdown information."""
-        logger.info("S.O.F.I.E. Wellness Backend Shutting Down")
     
     return app
 
