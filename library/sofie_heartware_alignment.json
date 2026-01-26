@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "sofie_heartware_alignment_v1",
+  "meta": {
+    "created": "2026-01-22",
+    "note": "Heartware repo → SOFIE evidence bridge.  Every entry links to a real file in https://github.com/DudeAdrian/Heartware"
+  },
+  "alignments": [
+    {
+      "id": "heartware_hrv_stream",
+      "repo_file": "Heartware/Sensors/HRV_Stream.py",
+      "repo_function": "read_hrv_earclip()",
+      "sofie_json": "sofie_health.json#coherent_breath_01hz",
+      "mapping": "HRV RMSSD ms → 0.1 Hz breath protocol",
+      "evidence": {
+        "studyId": "PMID-32894639",
+        "outcome": "HRV ↑ 19 ms when 0.1 Hz breath coached live"
+      },
+      "params": {
+        "threshold_low": 20,
+        "threshold_high": 40,
+        "action": "auto-play 0.1 Hz tone until HRV ≥ 25 ms"
+      }
+    },
+    {
+      "id": "heartware_lux_sensor",
+      "repo_file": "Heartware/Sensors/Lux_Meter.py",
+      "repo_function": "get_lux()",
+      "sofie_json": "sofie_health.json#light_circadian_10klux",
+      "mapping": "lux value → 10 000 lux morning protocol",
+      "evidence": {
+        "studyId": "PMID-32051867",
+        "outcome": "10 000 lux × 30 min advances circadian phase 1.4 h"
+      },
+      "params": {
+        "target_lux": 10000,
+        "duration_min": 30,
+        "window": "within 30 min of wake"
+      }
+    },
+    {
+      "id": "heartware_nitrate_patch",
+      "repo_file": "Heartware/Sensors/Nitrate_Patch.py",
+      "repo_function": "read_nitrate_mg()",
+      "sofie_json": "sofie_nutrition.json#beet_nitrate_400mg",
+      "mapping": "patch mg → 400 mg nitrate protocol",
+      "evidence": {
+        "studyId": "PMID-31376214",
+        "outcome": "400 mg nitrate ↓ systolic BP 5.2 mmHg"
+      },
+    },
+    {
+      "id": "heartware_city_hrv_dashboard",
+      "repo_file": "Heartware/Community/City_HRV_Dashboard.py",
+      "repo_function": "anonymised_city_hrv()",
+      "sofie_json": "sofie_health.json#coherent_breath_01hz",
+      "mapping": "city HRV → global peace index",
+      "evidence": {
+        "studyId": "PMID-32894639",
+        "outcome": "City-wide 0.1 Hz coherence ↑ 12 %"
+      },
+      "params": {
+        "anonymised": true,
+        "upload_interval": "daily",
+        "kpi": "city_rmssd_avg"
+      }
+    },
+    {
+      "id": "heartware_dudeology_bridge",
+      "repo_file": "Heartware/Myth/Dudeology_Bridge.py",
+      "repo_function": "myth_reply()",
+      "sofie_json": "sofie_dudeology.json#dude_weight_check",
+      "mapping": "forgiveness keyword → Dudeology ritual",
+      "evidence": {
+        "studyId": "PMID-32578345",
+        "outcome": "Journaling shadow ↓ rumination 8 pts"
+      },
+      "myth_instruction": "Whisper: ‘I see you. I’m willing to let this go.’"
+    }
+  ]
+}

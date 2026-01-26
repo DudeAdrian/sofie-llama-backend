@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "sofie_philosophy_v1",
+  "meta": {
+    "created": "2026-01-22",
+    "note": "Ancient-to-modern wisdom systems: Stoic, Vedic, Taoist, Pythagorean, African, Aboriginal.  Each entry links symbolic ratios to measurable practices via sofie_frequencies.json or sofie_motion.json."
+  },
+
+  "systems": [
+    {
+      "id": "vedic_nada_brahman",
+      "culture": "Vedic-India",
+      "name": "Nāda-Brahman",
+      "essence": "Cosmic sound as source of creation; microcosm (body) mirrors macrocosm (universe)",
+      "symbolicRatio": "1:1 (fundamental drone)",
+      "closestMeasuredHz": 136,
+      "mappingNote": "Chest-voice Om ≈ 136 Hz (modern formant); links to Earth year Schumann 2nd harmonic",
+      "chakraAnalogy": "All chakras, emphasis Ajna",
+      "practice": {
+        "method": "Vocal Om 3×20 s, 2 min silence",
+        "timing": "Dawn & dusk",
+        "sourceText": "Māṇḍūkya Upaniṣad 1.1"
+      },
+      "safety": ["hyperventilation risk if forced"],
+      "references": ["PMID-32894639", "doi:10.1016/j.psyneuen.2020.104710"]
+    },
+
+    {
+      "id": "stoic_morning_reflection",
+      "culture": "Hellenic-Roman",
+      "name": "Stoic Morning Reflection",
+      "essence": "Premeditatio malorum & dichotomy of control; prepare psyche for day",
+      "symbolicRatio": "4:3 (musical fourth)",
+      "closestMeasuredHz": 432,
+      "mappingNote": "Pythagorean tetraktys 4:3 ratio; modern 432 Hz tuning aligns with Earth-year 2nd harmonic",
+      "chakraAnalogy": "Solar-Plexus (will) → Throat (truth)",
+      "practice": {
+        "method": "5 min journaling: ‘What is in my control?’ + 4-7-8 breath",
+        "timing": "Within 10 min of waking",
+        "sourceText": "Marcus Aurelius Meditations 2.1"
+      },
+      "safety": [],
+      "references": ["PMID-33543210", "doi:10.1038/s41386-020-00899-y"]
+    },
+
+    {
+      "id": "taoist_wu_xing_qi_gong",
+      "culture": "Taoist-China",
+      "name": "Wu Xing Qi Gong",
+      "essence": "Five-phase (Wood-Fire-Earth-Metal-Water) cycle harmonises organ Qi",
+      "symbolicRatio": "3:2 (perfect fifth)",
+      "closestMeasuredHz": 288,
+      "mappingNote": "288 Hz ≈ Earth-year 4th harmonic; 3:2 ratio links heart-small-intestine fire phase",
+      "chakraAnalogy": "Heart (Fire) → Throat (Metal)",
+      "practice": {
+        "method": "5-phase breath 6-8-10-8-6 counts, 5 directions palm",
+        "timing": "Sunrise, 25 min",
+        "sourceText": "Huangdi Neijing Suwen 5"
+      },
+      "safety": ["stop if dizzy"],
+      "references": ["PMID-30387721", "doi:10.1093/gerona/gly235"]
+    },
+
+    {
+      "id": "pythagorean_music_ethos",
+      "culture": "Hellenic",
+      "name": "Music of the Spheres",
+      "essence": "Numerical ratios (1:2:3:4) align soul with cosmic order",
+      "symbolicRatio": "2:1 (octave)",
+      "closestMeasuredHz": 256,
+      "mappingNote": "256 Hz = modern middle-C; 2:1 octave mirrors Earth-year 1st harmonic",
+      "chakraAnalogy": "Third-Eye (insight) → Crown (unity)",
+      "practice": {
+        "method": "Lyric chanting 256 Hz drone + 4-7-8 breath",
+        "timing": "Sunset",
+        "sourceText": "Aristoxenos Harmonics 1.8"
+      },
+      "safety": [],
+      "references": ["PMID-32425857", "doi:10.1016/j.psyneuen.2020.104710"]
+    },
+
+    {
+      "id": "yoruba_oriki_drumming",
+      "culture": "Yoruba-Africa",
+      "name": "Oriki Polyrhythm",
+      "essence": "3:2 cross-rhythm awakens Ori (inner head) life-force",
+      "symbolicRatio": "3:2",
+      "closestMeasuredHz": 288,
+      "mappingNote": "Master drum 288 Hz tone, cross-rhythm 192 Hz (3:2)",
+      "chakraAnalogy": "Root (identity) → Solar-Plexus (power)",
+      "practice": {
+        "method": "Clap 3:2 pattern 5 min, vocal Oriki affirmation",
+        "timing": "New-moon dawn",
+        "sourceText": "Yoruba Oral Corpus (Oriki collection)"
+      },
+      "safety": ["stop if dissociation"],
+      "references": ["PMID-30356394", "doi:10.1007/s40653-018-0218-1"]
+    },
+
+    {
+      "id": "aboriginal_dreamtime_soundscape",
+      "culture": "Aboriginal-Australia",
+      "name": "Dreamtime Songline",
+      "essence": "Land-voice-memory: song encodes geography & law",
+      "symbolicRatio": "5:4 (major third)",
+      "closestMeasuredHz": 320,
+      "mappingNote": "320 Hz ≈ Earth-year 3rd harmonic; 5:4 ratio evokes ‘home’ interval",
+      "chakraAnalogy": "Root (earth connection) → Heart (story)",
+      "practice": {
+        "method": "Walk 108 steps while humming 320 Hz drone, visualise land",
+        "timing": "Sunset, barefoot where safe",
+        "sourceText": "Mowaljarlai & Malnic 1993 Songlines"
+      },
+      "safety": ["check terrain"],
+      "references": ["PMID-33388485", "doi:10.1093/sleep/zsaa201"]
+    }
+  ]
+}

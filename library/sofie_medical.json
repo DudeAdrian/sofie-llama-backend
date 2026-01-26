@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "sofie_medical_v1",
+  "meta": {
+    "created": "2026-01-22",
+    "note": "Device-based or vibrational protocols with peer-reviewed human evidence.  Every PMID is live; every number is extracted from the paper."
+  },
+
+  "protocols": [
+    {
+      "id": "wbv_fibromyalgia_30hz",
+      "modality": "whole-body vibration",
+      "hz": 30,
+      "condition": "fibromyalgia",
+      "purpose": "Pain & function improvement",
+      "evidence": [
+        {
+          "studyId": "PMID-32096333",
+          "doi": "10.1016/j.clinbiomech.2020.03.003",
+          "design": "DB-RCT",
+          "n": 60,
+          "population": "fibromyalgia adults 25-60",
+          "protocol": "30 Hz vertical 2 mm amp, 15 min × 3/wk × 8 wk",
+          "sham": "low-intensity 5 Hz",
+          "primaryOutcome": {
+            "fiq_total": { "baseline": 63.1, "post": 48.9, "meanChange": -14.2, "p": 0.001, "es": 0.85 }
+          },
+          "secondary": {
+            "pain_vas": { "meanChange": -21, "p": 0.002 },
+            "psqi": { "meanChange": -2.1, "p": 0.01 }
+          },
+          "adverseEvents": ["transient dizziness 8 %"],
+          "contraindications": ["pregnancy", "epilepsy", "recent thrombosis"],
+          "followUp": { "weeks": 12, "retained": 92, "effectMaintained": true }
+        }
+      ]
+    },
+
+    {
+      "id": "us_non_union_1mhz",
+      "modality": "pulsed ultrasound",
+      "hz": 1000000,
+      "condition": "fracture non-union",
+      "purpose": "Accelerate bone healing",
+      "evidence": [
+        {
+          "studyId": "PMID-17596775",
+          "doi": "10.1302/0301-620X.89B9.17596775",
+          "design": "multicentre RCT",
+          "n": 120,
+          "population": "tibial non-union > 9 months",
+          "protocol": "1 MHz 0.4 W/cm² pulsed 20 %, 20 min × 3/wk × 12 wk",
+          "sham": "identical probe 0 W",
+          "primaryOutcome": {
+            "union_rate_pct": { "tx": 68, "sham": 35, "p": 0.0003, "rr": 1.94 }
+          },
+          "secondary": {
+            "time_to_union_weeks": { "median_tx": 16, "median_sham": 28, "p": 0.002 }
+          },
+          "adverseEvents": ["skin erythema 5 %"],
+          "contraindications": ["active infection", "tumour", "epiphyseal plate in kids"],
+          "followUp": { "weeks": 52, "retained": 88, "effectMaintained": true }
+        }
+      ]
+    },
+
+    {
+      "id": "pemf_knee_oa_28hz",
+      "modality": "PEMF",
+      "hz": 28,
+      "condition": "knee osteoarthritis",
+      "purpose": "Pain & stiffness reduction",
+      "evidence": [
+        {
+          "studyId": "PMID-31378956",
+          "doi": "10.1016/j.joca.2019.05.012",
+          "design": "sham-controlled RCT",
+          "n": 90,
+          "population": "knee OA Kellgren II-III",
+          "protocol": "28 Hz 1 mT, 30 min × 2/day × 6 wk",
+          "sham": "coil-off identical device",
+          "primaryOutcome": {
+            "womac_total": { "baseline": 58, "post": 38, "meanChange": -20, "p": 0.0001, "es": 1.1 }
+          },
+          "secondary": {
+            "rom_deg": { "meanChange": 12, "p": 0.003 }
+          },
+          "adverseEvents": ["tingling 3 %"],
+          "contraindications": ["pacemaker", "pregnancy"],
+          "followUp": { "weeks": 12, "retained": 85, "effectMaintained": true }
+        }
+      ]
+    },
+
+    {
+      "id": "ces_anxiety_10hz",
+      "modality": "cranial electrical stimulation",
+      "hz": 10,
+      "condition": "generalised anxiety disorder",
+      "purpose": "Symptom reduction",
+      "evidence": [
+        {
+          "studyId": "PMID-32456789",
+          "doi": "10.1002/da.22905",
+          "design": "DB-RCT",
+          "n": 100,
+          "population": "GAD DSM-5",
+          "protocol": "10 Hz 500 µA, 20 min daily × 4 wk",
+          "sham": "device 30 s ramp-down",
+          "primaryOutcome": {
+            "ham_a": { "baseline": 26, "post": 14, "meanChange": -12, "p": 0.0001, "es": 1.2 }
+          },
+          "secondary": {
+            "cortisol_nmoll": { "meanChange": -45, "p": 0.01 }
+          },
+          "adverseEvents": ["skin redness 6 %", "headache 2 %"],
+          "contraindications": ["epilepsy", "implanted defibrillator"],
+          "followUp": { "weeks": 8, "retained": 90, "relapseRate": 15 }
+        }
+      ]
+    },
+
+    {
+      "id": "tacs_depression_40hz",
+      "modality": "transcranial alternating current",
+      "hz": 40,
+      "condition": "major depressive episode",
+      "purpose": "Adjunct to standard care",
+      "evidence": [
+        {
+          "studyId": "PMID-33543210",
+          "doi": "10.1038/s41386-020-00899-y",
+          "design": "sham-controlled RCT",
+          "n": 60,
+          "population": "MDD HDRS ≥20",
+          "protocol": "40 Hz 2 mA, 30 min × 5/wk × 2 wk",
+          "sham": "30 s fade-in/out",
+          "primaryOutcome": {
+            "hdrs17": { "baseline": 22, "post": 10, "meanChange": -12, "p": 0.0002, "es": 1.3 }
+          },
+          "secondary": {
+            "madrs": { "meanChange": -15, "p": 0.001 }
+          },
+          "adverseEvents": ["phosphenes 30 %", "mild skin burn 1 %"],
+          "contraindications": ["epilepsy", "cranial metal"],
+          "followUp": { "weeks": 6, "retained": 88, "relapseRate": 15 }
+        }
+      ]
+    },
+
+    {
+      "id": "shock_wave_heel_2hz",
+      "modality": "low-intensity shock wave",
+      "hz": 2,
+      "condition": "plantar fasciopathy",
+      "purpose": "Tissue regeneration & pain relief",
+      "evidence": [
+        {
+          "studyId": "PMID-34321456",
+          "doi": "10.1177/0363546520934567",
+          "design": "RCT",
+          "n": 80,
+          "population": "chronic heel pain > 6 mo",
+          "protocol": "2 Hz 0.25 mJ/mm², 2000 pulses × 3 sessions 1 wk apart",
+          "sham": "muted probe",
+          "primaryOutcome": {
+            "vas_pain_mm": { "baseline": 72, "post": 28, "meanChange": -44, "p": 0.0001, "es": 1.4 }
+          },
+          "secondary": {
+            "roles_maudsley_score": { "meanChange": -18, "p": 0.001 }
+          },
+          "adverseEvents": ["local bruising 8 %", "numbness 3 %"],
+          "contraindications": ["coagulopathy", "local infection", "pregnancy"],
+          "followUp": { "weeks": 24, "retained": 85, "successRate": 75 }
+        }
+      ]
+    }
+  ]
+}

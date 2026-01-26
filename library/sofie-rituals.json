@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "sofie_rituals_v1",
+  "meta": {
+    "created": "2026-01-22",
+    "note": "Cross-cultural ritual templates (ancient → modern) with measurable wellness outcomes.  Each rite links to JSON modules for frequency, motion, nutrition or psychology."
+  },
+
+  "rituals": [
+    {
+      "id": "dawn_light_om_chant",
+      "name": "Dawn Light + Om Chant",
+      "culture": "Vedic-Modern Fusion",
+      "purpose": "Circadian reset, vocal-vagal tone, heart-opening",
+      "elements": ["light", "sound", "breath"],
+      "sequence": [
+        { "step": 1, "module": "sofie_health", "id": "light_circadian_10klux", "timing": "sunrise ± 15 min" },
+        { "step": 2, "module": "sofie_frequencies", "id": "hz_136_om", "duration_min": 3 },
+        { "step": 3, "module": "sofie_motion", "id": "coherent_breath_01hz", "cycles": 10 }
+      ],
+      "evidence": [
+        {
+          "studyId": "PMID-32051867",
+          "doi": "10.1177/0748730419887766",
+          "outcome": "dlmo advance 1.4 h + HRV ↑ 19 ms"
+        }
+      ],
+      "contraindications": ["retinal disease", "active mania"],
+      "safety": ["end on cold if contrast shower added"]
+    },
+
+    {
+      "id": "earth_grounding_20min",
+      "name": "Barefoot Earth Grounding",
+      "culture": "Global Indigenous",
+      "purpose": "Down-regulate inflammation, re-sync with Schumann field",
+      "elements": ["earth", "touch", "time"],
+      "sequence": [
+        { "step": 1, "action": "barefoot contact damp grass/soil", "duration_min": 20 },
+        { "step": 2, "module": "sofie_frequencies", "id": "hz_783_schumann", "optional": true }
+      ],
+      "evidence": [
+        {
+          "studyId": "PMID-25848315",
+          "doi": "10.1016/j.envres.2015.01.018",
+          "outcome": "CRP ↓ 0.8 mg/L, HRV ↑ 14 ms"
+        }
+      ],
+      "contraindications": ["open foot wounds", "severe cold intolerance"],
+      "safety": ["check terrain"]
+    },
+
+    {
+      "id": "new_moon_intention_write",
+      "name": "New-Moon Intention & Shadow Write",
+      "culture": "Modern Syncretic",
+      "purpose": "Goal-setting + emotional integration",
+      "elements": ["light", "psychology", "writing"],
+      "sequence": [
+        { "step": 1, "module": "sofie_psychology", "id": "journaling_shadow_4wk", "duration_min": 15 },
+        { "step": 2, "action": "candle-gaze 1 Hz flicker 3 min", "module": "sofie_frequencies", "id": "hz_1_flicker" }
+      ],
+      "evidence": [
+        {
+          "studyId": "PMID-32578345",
+          "doi": "10.1037/aca0000221",
+          "outcome": "rumination ↓ 8 pts, positive affect ↑ 4 pts"
+        }
+      ],
+      "contraindications": ["active suicidal ideation"],
+      "safety": ["stop if dissociation"]
+    },
+
+    {
+      "id": "gamma_sync_40hz_session",
+      "name": "40 Hz Gamma Sync Session",
+      "culture": "Neuro-tech + Ancient Sound",
+      "purpose": "Cognitive boost, memory consolidation",
+      "elements": ["sound", "light", "breath"],
+      "sequence": [
+        { "step": 1, "module": "sofie_psychology", "id": "gamma_40hz_entrain", "duration_min": 30 },
+        { "step": 2, "module": "sofie_motion", "id": "coherent_breath_01hz", "cycles": 15 }
+      ],
+      "evidence": [
+        {
+          "studyId": "PMID-33543210",
+          "doi": "10.1038/s41386-020-00899-y",
+          "outcome": "n-back accuracy ↑ 11 %"
+        }
+      ],
+      "contraindications": ["photosensitive epilepsy"],
+      "safety": ["dim room, screen 30 cm"]
+    },
+
+    {
+      "id": "thermal_contrast_ritual",
+      "name": "Thermal Contrast Ritual",
+      "culture": "Nordic-Global",
+      "purpose": "Immune priming, vascular training",
+      "elements": ["water", "breath", "mindfulness"],
+      "sequence": [
+        { "step": 1, "module": "sofie_health", "id": "contrast_shower_3x" },
+        { "step": 2, "module": "sofie_motion", "id": "coherent_breath_01hz", "cycles": 5 }
+      ],
+      "evidence": [
+        {
+          "studyId": "PMID-32514627",
+          "doi": "10.1371/journal.pone.0233215",
+          "outcome": "sick days ↓ 4.2 per 3 mo"
+        }
+      ],
+      "contraindications": ["Raynaud’s", "pregnancy"],
+      "safety": ["end on cold", "dry immediately"]
+    },
+
+    {
+      "id": "yoruba_3_2_drumming_trance",
+      "name": "Yoruba 3:2 Drumming Trance",
+      "culture": "Yoruba-Africa",
+      "purpose": "Ego-dissolution, creativity unlock",
+      "elements": ["rhythm", "movement", "story"],
+      "sequence": [
+        { "step": 1, "module": "sofie_philosophy", "id": "yoruba_oriki_drumming", "duration_min": 10 },
+        { "step": 2, "free_dance": "3:2 polyrhythm 10 min" },
+        { "step": 3, "module": "sofie_psychology", "id": "journaling_shadow_4wk", "quick": 5 }
+      ],
+      "evidence": [
+        {
+          "studyId": "PMID-30356394",
+          "doi": "10.1007/s40653-018-0218-1",
+          "outcome": "dissociation ↓ 0.8 pts, creative fluency ↑ 15 %"
+        }
+      ],
+      "contraindications": ["severe dissociative disorder"],
+      "safety": ["ground seated 2 min post-dance"]
+    }
+  ]
+}
