@@ -11,7 +11,7 @@ from llama_cpp import Llama
 from core_sofie import SofieCore
 import logging
 
-MODEL_DIR = Path(__file__).parent / "models"
+MODEL_DIR = Path(\"C:/llama/library\")
 DEFAULT_MODEL = "llama-model.gguf"
 
 # ------------------------------------------------------------------
