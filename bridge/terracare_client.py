@@ -8,6 +8,7 @@ Connects sofie-backend to Terracare-Ledger for:
 """
 
 import os
+import requests
 from typing import Optional, Dict, Any
 
 TERRACARE_RPC_URL = os.getenv("TERRACARE_RPC_URL", "http://localhost:8545")
@@ -25,6 +26,7 @@ class TerracareClient:
     def connect(self) -> bool:
         """Check connection to Terracare node"""
         try:
+            # Would use web3.py in production
             self.connected = True
             print(f"[TerracareClient] Connected to {self.rpc_url}")
             return True
@@ -37,6 +39,7 @@ class TerracareClient:
         if not self.connected:
             return None
         
+        # Simulated response - would call contract in production
         return {
             "address": address,
             "role": "Patient",
@@ -44,12 +47,20 @@ class TerracareClient:
             "is_cooperative_member": False
         }
     
-    def log_activity(self, user_id: str, activity_type: str, value_points: int) -> bool:
+    def log_activity(
+        self,
+        user_id: str,
+        activity_type: str,
+        value_points: int,
+        metadata: Optional[Dict] = None
+    ) -> bool:
         """Log wellness activity for MINE token rewards (Pillar 5)"""
         if not self.connected:
             return False
         
         print(f"[TerracareClient] Logging activity: {activity_type} (+{value_points} pts)")
+        
+        # Would call ActivityRegistry.mineActivity() in production
         return True
     
     def get_token_balances(self, address: str) -> Dict[str, str]:
@@ -57,12 +68,22 @@ class TerracareClient:
         if not self.connected:
             return {"mine": "0", "well": "0"}
         
+        # Simulated response - would call TokenEngine in production
         return {
             "mine": "1000",
             "well": "10",
             "staked": "500",
             "voting_power": "500"
         }
+    
+    def get_voting_power(self, address: str) -> str:
+        """Get governance voting power (Pillar 4)"""
+        if not self.connected:
+            return "0"
+        
+        balances = self.get_token_balances(address)
+        return balances.get("voting_power", "0")
 
 
+# Export singleton
 terracare_client = TerracareClient()

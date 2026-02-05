@@ -196,12 +196,11 @@ API_PORT=8000
 
 | Repo | Layer | Role |
 |------|-------|------|
-| [Terracare-Ledger](../Terracare-Ledger) | Layer 1 | Blockchain foundation |
+| [Terracare-Ledger](../) | Layer 1 | Blockchain foundation |
 | [sofie-systems](../sofie-systems) | Layer 2 | S.O.F.I.E. core engine |
 | [sandironratio-node](../sandironratio-node) | Layer 3 | 9 Chambers Academy |
-| [Heartware](../Heartware) | Layer 3 | Voice AI companion |
-| [Harmonic-Balance](../Harmonic-Balance) | Layer 3 | Sacred geometry |
-| [tholos-medica](../tholos-medica) | Layer 3 | Medical devices |
+| [sofie-map-system](../sofie-map-system) | Layer 3 | Spatial services |
+| [terratone](../terratone) | Layer 3 | Sustainability platform |
 
 ---
 

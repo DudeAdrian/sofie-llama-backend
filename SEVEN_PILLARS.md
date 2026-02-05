@@ -10,7 +10,7 @@ sofie-backend implements the wellness intelligence layer of the Seven Pillar Arc
 
 ### Pillar 1: Underground Knowledge
 **Location**: `p1-knowledge/`
-- Evidence library with JSON knowledge bases
+- Evidence library with 10+ JSON knowledge bases
 - Protocol matching based on user intent
 - PubMed-linked research anchoring
 
@@ -67,10 +67,14 @@ Intelligence.recognize_pattern(input)
 Eternal.remember(memory)
 ```
 
-### To Layer 3 (All)
-- Heartware: Voice interface
-- Harmonic-Balance: Dwelling wellness
-- tholos-medica: Patient outcomes
+### To Layer 3 (sandironratio-node)
+```python
+# Chamber progression
+sandironratio_client.advance_chamber(
+    user_id=user_id,
+    pillar=7
+)
+```
 
 ## API Conventions
 
@@ -82,6 +86,17 @@ Examples:
 POST /p1/query              # Query evidence
 POST /p7/ledger/entry       # Log somatic data
 GET  /p7/ledger/peace-curve # Get predictions
+```
+
+### Response Format
+```json
+{
+  "success": true,
+  "pillar": 7,
+  "operators": ["I", "E"],
+  "data": {},
+  "timestamp": "2026-02-05T14:28:48Z"
+}
 ```
 
 ## Version

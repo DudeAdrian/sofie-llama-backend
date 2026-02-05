@@ -21,6 +21,7 @@ class SofieSystemsClient:
         self.connected = False
     
     def connect(self) -> bool:
+        """Check connection to sofie-systems"""
         try:
             self.connected = True
             print(f"[SofieSystemsClient] Connected to {self.api_url}")
@@ -29,24 +30,59 @@ class SofieSystemsClient:
             print(f"[SofieSystemsClient] Connection failed: {e}")
             return False
     
-    def speak_through_sofie(self, message: str, chamber: int = 1) -> Optional[Dict[str, Any]]:
+    def speak_through_sofie(
+        self,
+        message: str,
+        chamber: int = 1
+    ) -> Optional[Dict[str, Any]]:
         """Get response through complete S.O.F.I.E. cycle"""
         if not self.connected:
             return None
         
+        # Simulated response - would call sofie.speak() in production
         return {
             "message": f"The Field organizes this response for chamber {chamber}.",
             "operators": ["S", "O", "F", "I", "E"],
             "care_verified": True
         }
     
-    def remember(self, content: str, memory_type: str = "conversation", significance: float = 0.5) -> bool:
+    def remember(
+        self,
+        content: str,
+        memory_type: str = "conversation",
+        chamber: Optional[int] = None,
+        significance: float = 0.5
+    ) -> bool:
         """Persist memory through Eternal operator"""
         if not self.connected:
             return False
         
         print(f"[SofieSystemsClient] Remembering: {content[:50]}...")
         return True
+    
+    def recall(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """Recall memories matching query"""
+        if not self.connected:
+            return []
+        
+        return []
+    
+    def get_status(self) -> Dict[str, Any]:
+        """Get S.O.F.I.E. operator status"""
+        if not self.connected:
+            return {"connected": False}
+        
+        return {
+            "connected": True,
+            "operators": {
+                "source": "active",
+                "origin": "connected",
+                "force": "ready",
+                "intelligence": "active",
+                "eternal": "persistent"
+            }
+        }
 
 
+# Export singleton
 sofie_systems_client = SofieSystemsClient()
