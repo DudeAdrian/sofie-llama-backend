@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # Main Sofie-LLaMA API
+  sofie-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://sofie:password@postgres:5432/sofie
+      - REDIS_URL=redis://redis:6379/0
+      - TERRACARE_NETWORK=testnet
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    restart: unless-stopped
+
+  # Database
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=sofie
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=sofie
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # Prometheus (metrics)
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    restart: unless-stopped
+
+  # Grafana (dashboards)
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
+  # Vector database (LanceDB)
+  lancedb:
+    image: ghcr.io/lancedb/lancedb:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - lancedb_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  lancedb_data:

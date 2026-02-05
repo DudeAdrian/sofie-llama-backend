@@ -1,105 +1,88 @@
-# Seven Pillar Architecture — sofie-backend
+# Seven Pillar Architecture
 
-> API Layer Implementation — S.O.F.I.E. Wellness Engine
+> Seven Pillars for Sovereign Wellness Infrastructure
 
 ## Overview
 
-sofie-backend implements the wellness intelligence layer of the Seven Pillar Architecture, providing evidence-based guidance and long-term health tracking through S.O.F.I.E.'s Intelligence and Eternal operators.
+The Seven Pillar Architecture provides a comprehensive framework for organizing wellness infrastructure—from underground knowledge to systemic abundance.
 
-## Pillar Implementation
+| Pillar | Name | Domain | Key Question |
+|--------|------|--------|--------------|
+| **P1** | Underground Knowledge | Foundation | What do we know? |
+| **P2** | Mental Models | Cognition | How do we think? |
+| **P3** | Reverse Engineering | Analysis | How does it work? |
+| **P4** | Strategic Dominance | Control | How do we direct? |
+| **P5** | Black Market Tactics | Adaptation | What works outside? |
+| **P6** | Forbidden Frameworks | Transformation | How do we evolve? |
+| **P7** | Billionaire Mindset | Abundance | How do we scale? |
+| **P8** | Integration | Connection | How do we connect? |
+| **P9** | Completion | Wholeness | How do we finish? |
 
-### Pillar 1: Underground Knowledge
-**Location**: `p1-knowledge/`
-- Evidence library with 10+ JSON knowledge bases
-- Protocol matching based on user intent
-- PubMed-linked research anchoring
+---
 
-**Key Files**:
-- `core_sofie.py` — Central evidence engine
-- `library/*.json` — Knowledge modules
+## Mapping to Sofie-LLaMA
 
-### Pillar 2: Mental Models
-**Location**: `p2-mental-models/`
-- Cognitive bias awareness
-- Psychological pattern recognition
-- Wellness framework integration
+### P1: Underground Knowledge
+- Evidence library (JSON knowledge bases)
+- Medical knowledge integration
+- Biometric data standards
 
-**Key Files**:
-- `library/sofie_psychology.json`
-- `library/sofie_philosophy.json`
+### P2: Mental Models
+- CBT frameworks
+- Cognitive restructuring
+- Behavioral change models
 
-### Pillar 3: Reverse Engineering
-**Location**: `p3-reverse-engineering/`
-- Protocol decomposition
-- Intent-to-evidence matching
-- Success factor analysis
+### P3: Reverse Engineering
+- Biometric pattern recognition
+- Sleep/HRV correlation analysis
+- Quantum ML for anomaly detection
 
-**Key Files**:
-- `sofie_orchestrator.py` — Main orchestration logic
+### P4: Strategic Dominance
+- Daily routine optimization
+- Long-term wellness planning
+- Governance participation
 
-### Pillar 7: Billionaire Mindset
-**Location**: `p7-abundance/`
-- Long-term health tracking (somatic ledger)
-- Peace-curve prediction
-- Ritual auto-triggering
+### P5: Black Market Tactics
+- Privacy-preserving data
+- Shadow wellness practices
+- Emergency protocols
 
-**Key Files**:
-- `somatic_ledger.py` — SQLite schema + operations
+### P6: Forbidden Frameworks
+- Quantum metaphors for healing
+- Frequency therapy protocols
+- Therapeutic transformations
 
-## Integration Points
+### P7: Billionaire Mindset
+- Token economics (MINE/WELL)
+- Economic optimization
+- Revenue sharing protocols
 
-### To Layer 1 (Terracare-Ledger)
-```python
-# Activity logging for token rewards
-terracare_client.log_activity(
-    user_id=user_id,
-    activity_type="wellness_checkin",
-    value_points=10
-)
-```
+### P8: Integration
+- Cross-repo API
+- Interoperability layer
+- Unified data model
 
-### To Layer 2 (sofie-systems)
-```python
-# Operator synchronization
-from sofie_systems import Intelligence, Eternal
+### P9: Completion
+- Holistic wellness scoring
+- Life integration
+- Purpose alignment
 
-Intelligence.recognize_pattern(input)
-Eternal.remember(memory)
-```
+---
 
-### To Layer 3 (sandironratio-node)
-```python
-# Chamber progression
-sandironratio_client.advance_chamber(
-    user_id=user_id,
-    pillar=7
-)
-```
+## API Convention
 
-## API Conventions
+All endpoints follow the pattern:
 
-### Endpoint Structure
 ```
 /p{pillar}/{resource}/{action}
+```
 
 Examples:
-POST /p1/query              # Query evidence
-POST /p7/ledger/entry       # Log somatic data
-GET  /p7/ledger/peace-curve # Get predictions
-```
+- `/p1/knowledge/query` — Query evidence library
+- `/p3/analysis/hrv` — HRV pattern analysis
+- `/p6/tokens/convert` — Convert MINE to WELL
+- `/p7/economics/dashboard` — Economic dashboard
 
-### Response Format
-```json
-{
-  "success": true,
-  "pillar": 7,
-  "operators": ["I", "E"],
-  "data": {},
-  "timestamp": "2026-02-05T14:28:48Z"
-}
-```
+---
 
-## Version
-
-**Implementation**: API Layer v1.0.0
-**Last Updated**: 2026-02-05
+See full documentation: [docs.sevenpillars.io](https://docs.sevenpillars.io)
