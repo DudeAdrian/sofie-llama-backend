@@ -1,6 +1,6 @@
 """
 Sofie-LLaMA Backend v6.0.0 — Main Entry Point
-Quantum-Ready Wellness Intelligence
+Quantum-Ready Wellness Intelligence with Production Jarvis
 """
 
 import asyncio
@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
-from core.architecture import SofieCore, SofieConfig, DeploymentTier
+from core.architecture import SofieCore, SofieConfig, DeploymentTier, create_sofie_core_from_env
 from quantum.literal_quantum import QuantumOptimizer
 from quantum.metaphorical_quantum import MetaphoricalQuantumEngine
 from quantum.quantum_security import WellnessDataVault
@@ -39,20 +39,46 @@ async def lifespan(app: FastAPI):
     print("🌸 Initializing Sofie-LLaMA v6.0.0-quantum...")
     print("=" * 60)
     
-    # Determine deployment tier
-    tier_str = os.getenv("DEPLOYMENT_TIER", "architect")
-    tier = DeploymentTier(tier_str)
+    # Check for Ollama mode
+    use_ollama = os.getenv("USE_OLLAMA", "false").lower() == "true"
     
-    # Initialize core
-    config = SofieConfig(
-        deployment_tier=tier,
-        enable_quantum=os.getenv("ENABLE_QUANTUM_OPTIMIZATION", "true").lower() == "true",
-        context_window=int(os.getenv("CONTEXT_WINDOW", "128000")),
-        local_path=os.getenv("MODEL_PATH")
-    )
-    
-    sofie_core = SofieCore(config)
-    await sofie_core.initialize()
+    if use_ollama:
+        print("🔧 Ollama mode detected - using local LLM")
+        print(f"   Ollama URL: {os.getenv('OLLAMA_HOST', 'http://localhost:11434')}")
+        print(f"   Model: {os.getenv('OLLAMA_MODEL', 'llama3.1:8b')}")
+        print()
+        
+        # Initialize with Ollama
+        sofie_core = create_sofie_core_from_env()
+        await sofie_core.initialize()
+    else:
+        print("🔧 HuggingFace mode - checking for gated model access...")
+        
+        # Determine deployment tier
+        tier_str = os.getenv("DEPLOYMENT_TIER", "architect")
+        tier = DeploymentTier(tier_str)
+        
+        # Initialize core
+        config = SofieConfig(
+            deployment_tier=tier,
+            enable_quantum=os.getenv("ENABLE_QUANTUM_OPTIMIZATION", "true").lower() == "true",
+            context_window=int(os.getenv("CONTEXT_WINDOW", "128000")),
+            local_path=os.getenv("MODEL_PATH")
+        )
+        
+        sofie_core = SofieCore(config)
+        
+        try:
+            await sofie_core.initialize()
+        except Exception as e:
+            print(f"⚠️ HuggingFace initialization failed: {e}")
+            print("🔄 Falling back to Ollama mode...")
+            print()
+            
+            # Auto-fallback to Ollama
+            os.environ["USE_OLLAMA"] = "true"
+            sofie_core = create_sofie_core_from_env()
+            await sofie_core.initialize()
     
     # Initialize quantum layer
     quantum_optimizer = QuantumOptimizer()
@@ -91,13 +117,27 @@ async def lifespan(app: FastAPI):
     
     if jarvis_config["autonomous_enabled"]:
         await jarvis.start()
-    print("🤖 JARVIS system activated")
+    print("🤖 JARVIS Production System activated")
+    print("   Components:")
+    print("   - Voice Biometric Auth (Resemblyzer)")
+    print("   - Speech-to-Text (faster-whisper)")
+    print("   - Intent Engine (NLP)")
+    print("   - GitHub Integration (PyGithub)")
+    print("   - Code Generation (Ollama/LLaMA)")
+    print("   - Safety Guardian (Syntax/Secret checks)")
     
     print("=" * 60)
-    print("✅ Sofie-LLaMA v6.0.0-quantum ready!")
-    print(f"   Tier: {tier.value}")
-    print(f"   Quantum: {'enabled' if config.enable_quantum else 'disabled'}")
-    print(f"   JARVIS: {'autonomous' if jarvis_config['autonomous_enabled'] else 'manual'}")
+    
+    if use_ollama or os.getenv("USE_OLLAMA", "false").lower() == "true":
+        print("✅ Sofie-LLaMA v6.0.0-quantum + Production Jarvis ready!")
+        print(f"   Mode: Ollama (Local)")
+        print(f"   Model: {os.getenv('OLLAMA_MODEL', 'llama3.1:8b')}")
+    else:
+        print("✅ Sofie-LLaMA v6.0.0-quantum + Production Jarvis ready!")
+        print(f"   Mode: HuggingFace Transformers")
+    
+    print(f"   Quantum: {'enabled' if sofie_core.config.enable_quantum else 'disabled'}")
+    print(f"   JARVIS: {'autonomous' if jarvis_config['autonomous_enabled'] else 'manual'} (Production)")
     print("=" * 60)
     
     yield
@@ -128,12 +168,27 @@ for route in routes_app.routes:
 @app.get("/")
 async def root():
     """Root endpoint"""
+    use_ollama = os.getenv("USE_OLLAMA", "false").lower() == "true"
     return {
         "name": "Sofie-LLaMA Backend",
         "version": "6.0.0-quantum",
         "status": "operational",
         "quantum_ready": True,
+        "ollama_mode": use_ollama,
+        "model": os.getenv("OLLAMA_MODEL", "llama3.1:8b") if use_ollama else "Llama-3.1-70B",
         "documentation": "/docs"
+    }
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint"""
+    use_ollama = os.getenv("USE_OLLAMA", "false").lower() == "true"
+    return {
+        "status": "healthy",
+        "sofie_core": "loaded" if sofie_core else "not_loaded",
+        "ollama_mode": use_ollama,
+        "jarvis": "active" if jarvis and jarvis.is_running else "inactive"
     }
 
 
@@ -143,6 +198,10 @@ if __name__ == "__main__":
     host = os.getenv("API_HOST", "0.0.0.0")
     port = int(os.getenv("API_PORT", "8000"))
     workers = int(os.getenv("API_WORKERS", "1"))
+    
+    print(f"Starting Sofie-LLaMA on {host}:{port}")
+    print(f"USE_OLLAMA={os.getenv('USE_OLLAMA', 'false')}")
+    print()
     
     uvicorn.run(
         "main:app",

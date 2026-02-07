@@ -1,20 +1,19 @@
 """
 Sofie-LLaMA Backend v6.0.0 — Core Architecture
-LLaMA 3 70B base with wellness fine-tuning
+LLaMA 3 70B base with wellness fine-tuning OR local Ollama
 """
 
+import os
 from dataclasses import dataclass
-from typing import Optional, AsyncIterator, Dict, Any
+from typing import Optional, AsyncIterator, Dict, Any, Union
 from enum import Enum
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
-from threading import Thread
 
 class DeploymentTier(Enum):
     ARCHITECT = "architect"      # Local, quantum-ready, full access
     PRO = "pro"                  # Cloud, quantum optimization, API
     STANDARD = "standard"        # Classical AI, wellness guidance
     LITE = "lite"                # Simplified, wearable-only
+    OLLAMA = "ollama"            # Local Ollama (no HuggingFace auth)
 
 @dataclass
 class SofieConfig:
@@ -29,16 +28,22 @@ class SofieConfig:
     enable_streaming: bool = True
     response_timeout_ms: int = 200
     local_path: Optional[str] = "./models/llama-3.1-70b-wellness"
+    use_ollama: bool = False
+    ollama_url: str = "http://localhost:11434"
+    ollama_model: str = "llama3.1:8b"
+
 
 class SofieCore:
     """
     Core LLaMA 3 70B engine with wellness fine-tuning
+    OR Local Ollama client (no HuggingFace auth required)
     
     Features:
     - 128k context window for full user history
     - <200ms response time with streaming
     - Wellness corpus fine-tuning
     - Local deployment for Architect tier
+    - Ollama mode for easy local setup
     - Cloud scaling for other tiers
     """
     
@@ -46,44 +51,84 @@ class SofieCore:
         self.config = config
         self.model = None
         self.tokenizer = None
+        self.ollama_client = None
         self.conversation_history = []
         self.wellness_context = {}
         self.quantum_state = None
+        self.use_ollama = config.use_ollama
         
     async def initialize(self):
-        """Initialize the model with wellness fine-tuning"""
-        print(f"🌸 Initializing Sofie-LLaMA v6.0.0-quantum...")
-        print(f"   Model: {self.config.model_name}")
-        print(f"   Context: {self.config.context_window} tokens")
-        print(f"   Tier: {self.config.deployment_tier.value}")
-        print(f"   Quantum: {'enabled' if self.config.enable_quantum else 'disabled'}")
+        """Initialize the model - either Ollama or HuggingFace"""
         
-        # Load tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.config.local_path or self.config.model_name,
-            trust_remote_code=True
-        )
-        
-        # Load model with optimizations
-        load_kwargs = {
-            "torch_dtype": torch.bfloat16,
-            "device_map": "auto",
-            "trust_remote_code": True,
-        }
-        
-        # Architect tier: Local with full precision
-        if self.config.deployment_tier == DeploymentTier.ARCHITECT:
-            load_kwargs["load_in_4bit"] = False
-            print("   Loading full 70B model locally...")
+        if self.use_ollama:
+            # Use local Ollama - no HuggingFace auth required
+            print(f"🌸 Initializing Sofie-LLaMA with Ollama...")
+            print(f"   Model: {self.config.ollama_model}")
+            print(f"   Context: {self.config.context_window} tokens")
+            print(f"   Tier: {self.config.deployment_tier.value}")
+            print(f"   Endpoint: {self.config.ollama_url}")
+            
+            # Import Ollama client
+            from .ollama_client import OllamaClient
+            
+            self.ollama_client = OllamaClient(
+                base_url=self.config.ollama_url,
+                model=self.config.ollama_model,
+                context_window=self.config.context_window
+            )
+            await self.ollama_client.initialize()
+            
         else:
-            # Cloud tiers: Quantized for efficiency
-            load_kwargs["load_in_8bit"] = True
-            print("   Loading quantized model...")
-        
-        self.model = AutoModelForCausalLM.from_pretrained(
-            self.config.local_path or self.config.model_name,
-            **load_kwargs
-        )
+            # Use HuggingFace transformers (requires auth for gated models)
+            print(f"🌸 Initializing Sofie-LLaMA v6.0.0-quantum...")
+            print(f"   Model: {self.config.model_name}")
+            print(f"   Context: {self.config.context_window} tokens")
+            print(f"   Tier: {self.config.deployment_tier.value}")
+            print(f"   Quantum: {'enabled' if self.config.enable_quantum else 'disabled'}")
+            
+            try:
+                import torch
+                from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+                from threading import Thread
+                
+                # Load tokenizer
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    self.config.local_path or self.config.model_name,
+                    trust_remote_code=True
+                )
+                
+                # Load model with optimizations
+                load_kwargs = {
+                    "torch_dtype": torch.bfloat16,
+                    "device_map": "auto",
+                    "trust_remote_code": True,
+                }
+                
+                # Architect tier: Local with full precision
+                if self.config.deployment_tier == DeploymentTier.ARCHITECT:
+                    load_kwargs["load_in_4bit"] = False
+                    print("   Loading full 70B model locally...")
+                else:
+                    # Cloud tiers: Quantized for efficiency
+                    load_kwargs["load_in_8bit"] = True
+                    print("   Loading quantized model...")
+                
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    self.config.local_path or self.config.model_name,
+                    **load_kwargs
+                )
+                
+            except Exception as e:
+                print(f"   ⚠️ HuggingFace initialization failed: {e}")
+                print(f"   Falling back to Ollama mode...")
+                self.use_ollama = True
+                from .ollama_client import OllamaClient
+                self.ollama_client = OllamaClient(
+                    base_url=self.config.ollama_url,
+                    model=self.config.ollama_model,
+                    context_window=self.config.context_window
+                )
+                await self.ollama_client.initialize()
         
         print("✅ Sofie-LLaMA ready")
         
@@ -97,64 +142,76 @@ class SofieCore:
         Generate response with streaming support
         Target: <200ms first token, continuous streaming
         """
-        # Build full context with wellness system prompt
-        if system_prompt is None:
-            system_prompt = self._get_wellness_system_prompt()
+        if self.use_ollama and self.ollama_client:
+            # Use Ollama
+            async for chunk in self.ollama_client.generate(prompt, system_prompt, stream):
+                yield chunk
+        elif self.model and self.tokenizer:
+            # Use HuggingFace transformers
+            import torch
+            from transformers import TextIteratorStreamer
+            from threading import Thread
             
-        messages = [
-            {"role": "system", "content": system_prompt},
-            *self.conversation_history[-10:],  # Last 10 exchanges
-            {"role": "user", "content": prompt}
-        ]
-        
-        # Tokenize
-        text = self.tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
-        )
-        inputs = self.tokenizer(text, return_tensors="pt").to(self.model.device)
-        
-        if stream:
-            # Streaming generation
-            streamer = TextIteratorStreamer(
-                self.tokenizer, 
-                skip_prompt=True, 
-                skip_special_tokens=True
-            )
-            
-            generation_kwargs = dict(
-                inputs,
-                streamer=streamer,
-                max_new_tokens=self.config.max_response_tokens,
-                temperature=self.config.temperature,
-                top_p=self.config.top_p,
-                do_sample=True,
-            )
-            
-            # Run generation in separate thread
-            thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
-            thread.start()
-            
-            response_text = ""
-            for text in streamer:
-                response_text += text
-                yield text
+            # Build full context with wellness system prompt
+            if system_prompt is None:
+                system_prompt = self._get_wellness_system_prompt()
                 
-            # Store in history
-            self.conversation_history.append({"role": "user", "content": prompt})
-            self.conversation_history.append({"role": "assistant", "content": response_text})
-        else:
-            # Non-streaming (for API compatibility)
-            outputs = self.model.generate(
-                **inputs,
-                max_new_tokens=self.config.max_response_tokens,
-                temperature=self.config.temperature,
-                top_p=self.config.top_p,
-                do_sample=True,
+            messages = [
+                {"role": "system", "content": system_prompt},
+                *self.conversation_history[-10:],  # Last 10 exchanges
+                {"role": "user", "content": prompt}
+            ]
+            
+            # Tokenize
+            text = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
             )
-            response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            yield response
+            inputs = self.tokenizer(text, return_tensors="pt").to(self.model.device)
+            
+            if stream:
+                # Streaming generation
+                streamer = TextIteratorStreamer(
+                    self.tokenizer, 
+                    skip_prompt=True, 
+                    skip_special_tokens=True
+                )
+                
+                generation_kwargs = dict(
+                    inputs,
+                    streamer=streamer,
+                    max_new_tokens=self.config.max_response_tokens,
+                    temperature=self.config.temperature,
+                    top_p=self.config.top_p,
+                    do_sample=True,
+                )
+                
+                # Run generation in separate thread
+                thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
+                thread.start()
+                
+                response_text = ""
+                for text in streamer:
+                    response_text += text
+                    yield text
+                    
+                # Store in history
+                self.conversation_history.append({"role": "user", "content": prompt})
+                self.conversation_history.append({"role": "assistant", "content": response_text})
+            else:
+                # Non-streaming (for API compatibility)
+                outputs = self.model.generate(
+                    **inputs,
+                    max_new_tokens=self.config.max_response_tokens,
+                    temperature=self.config.temperature,
+                    top_p=self.config.top_p,
+                    do_sample=True,
+                )
+                response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+                yield response
+        else:
+            yield "Error: No model loaded. Check Ollama is running or HuggingFace auth."
             
     def _get_wellness_system_prompt(self) -> str:
         """Get the wellness-optimized system prompt"""
@@ -198,9 +255,14 @@ You have access to 100+ wellness functions, quantum optimization, and full ecosy
     async def add_wellness_context(self, context: Dict[str, Any]):
         """Add biometric and environmental context to the model"""
         self.wellness_context.update(context)
+        if self.ollama_client:
+            await self.ollama_client.add_wellness_context(context)
         
     def get_stats(self) -> Dict[str, Any]:
         """Get model performance statistics"""
+        if self.use_ollama and self.ollama_client:
+            return self.ollama_client.get_stats()
+        
         return {
             "model": self.config.model_name,
             "context_window": self.config.context_window,
@@ -209,3 +271,19 @@ You have access to 100+ wellness functions, quantum optimization, and full ecosy
             "quantum_enabled": self.config.enable_quantum,
             "device": str(self.model.device if self.model else "not_loaded"),
         }
+
+
+# Factory function for easy initialization
+def create_sofie_core_from_env() -> SofieCore:
+    """Create SofieCore from environment variables"""
+    use_ollama = os.getenv("USE_OLLAMA", "false").lower() == "true"
+    
+    config = SofieConfig(
+        use_ollama=use_ollama,
+        ollama_url=os.getenv("OLLAMA_HOST", "http://localhost:11434"),
+        ollama_model=os.getenv("OLLAMA_MODEL", "llama3.1:8b"),
+        context_window=int(os.getenv("CONTEXT_WINDOW", "128000")),
+        deployment_tier=DeploymentTier.OLLAMA if use_ollama else DeploymentTier.ARCHITECT
+    )
+    
+    return SofieCore(config)
