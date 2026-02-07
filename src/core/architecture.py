@@ -37,14 +37,6 @@ class SofieCore:
     """
     Core LLaMA 3 70B engine with wellness fine-tuning
     OR Local Ollama client (no HuggingFace auth required)
-    
-    Features:
-    - 128k context window for full user history
-    - <200ms response time with streaming
-    - Wellness corpus fine-tuning
-    - Local deployment for Architect tier
-    - Ollama mode for easy local setup
-    - Cloud scaling for other tiers
     """
     
     def __init__(self, config: SofieConfig):
@@ -60,15 +52,21 @@ class SofieCore:
     async def initialize(self):
         """Initialize the model - either Ollama or HuggingFace"""
         
+        # FORCE check environment variable at runtime (in case config wasn't set properly)
+        env_use_ollama = os.getenv("USE_OLLAMA", "").lower() == "true"
+        if env_use_ollama:
+            self.use_ollama = True
+            print(f"   [DEBUG] Environment USE_OLLAMA=true detected, forcing Ollama mode")
+        
         if self.use_ollama:
-            # Use local Ollama - no HuggingFace auth required
+            # Use local Ollama - NO HuggingFace imports or calls
             print(f"🌸 Initializing Sofie-LLaMA with Ollama...")
             print(f"   Model: {self.config.ollama_model}")
             print(f"   Context: {self.config.context_window} tokens")
             print(f"   Tier: {self.config.deployment_tier.value}")
             print(f"   Endpoint: {self.config.ollama_url}")
             
-            # Import Ollama client
+            # Import Ollama client (local only, no HF)
             from .ollama_client import OllamaClient
             
             self.ollama_client = OllamaClient(
@@ -77,20 +75,22 @@ class SofieCore:
                 context_window=self.config.context_window
             )
             await self.ollama_client.initialize()
+            print("✅ Sofie-LLaMA (Ollama) ready")
             
         else:
             # Use HuggingFace transformers (requires auth for gated models)
-            print(f"🌸 Initializing Sofie-LLaMA v6.0.0-quantum...")
+            print(f"🌸 Initializing Sofie-LLaMA with HuggingFace...")
             print(f"   Model: {self.config.model_name}")
             print(f"   Context: {self.config.context_window} tokens")
             print(f"   Tier: {self.config.deployment_tier.value}")
             print(f"   Quantum: {'enabled' if self.config.enable_quantum else 'disabled'}")
             
+            # Import HF libraries ONLY in this branch
+            import torch
+            from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
+            from threading import Thread
+            
             try:
-                import torch
-                from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
-                from threading import Thread
-                
                 # Load tokenizer
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     self.config.local_path or self.config.model_name,
@@ -118,10 +118,14 @@ class SofieCore:
                     **load_kwargs
                 )
                 
+                print("✅ Sofie-LLaMA (HuggingFace) ready")
+                
             except Exception as e:
                 print(f"   ⚠️ HuggingFace initialization failed: {e}")
-                print(f"   Falling back to Ollama mode...")
+                print(f"   🔄 Falling back to Ollama mode...")
                 self.use_ollama = True
+                
+                # Import Ollama client for fallback
                 from .ollama_client import OllamaClient
                 self.ollama_client = OllamaClient(
                     base_url=self.config.ollama_url,
@@ -129,8 +133,7 @@ class SofieCore:
                     context_window=self.config.context_window
                 )
                 await self.ollama_client.initialize()
-        
-        print("✅ Sofie-LLaMA ready")
+                print("✅ Sofie-LLaMA (Ollama fallback) ready")
         
     async def generate(
         self, 
@@ -140,12 +143,12 @@ class SofieCore:
     ) -> AsyncIterator[str]:
         """
         Generate response with streaming support
-        Target: <200ms first token, continuous streaming
         """
         if self.use_ollama and self.ollama_client:
-            # Use Ollama
+            # Use Ollama - no tokenizer needed
             async for chunk in self.ollama_client.generate(prompt, system_prompt, stream):
                 yield chunk
+                
         elif self.model and self.tokenizer:
             # Use HuggingFace transformers
             import torch
@@ -158,7 +161,7 @@ class SofieCore:
                 
             messages = [
                 {"role": "system", "content": system_prompt},
-                *self.conversation_history[-10:],  # Last 10 exchanges
+                *self.conversation_history[-10:],
                 {"role": "user", "content": prompt}
             ]
             
@@ -171,7 +174,6 @@ class SofieCore:
             inputs = self.tokenizer(text, return_tensors="pt").to(self.model.device)
             
             if stream:
-                # Streaming generation
                 streamer = TextIteratorStreamer(
                     self.tokenizer, 
                     skip_prompt=True, 
@@ -187,7 +189,6 @@ class SofieCore:
                     do_sample=True,
                 )
                 
-                # Run generation in separate thread
                 thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
                 thread.start()
                 
@@ -196,11 +197,9 @@ class SofieCore:
                     response_text += text
                     yield text
                     
-                # Store in history
                 self.conversation_history.append({"role": "user", "content": prompt})
                 self.conversation_history.append({"role": "assistant", "content": response_text})
             else:
-                # Non-streaming (for API compatibility)
                 outputs = self.model.generate(
                     **inputs,
                     max_new_tokens=self.config.max_response_tokens,
@@ -211,7 +210,7 @@ class SofieCore:
                 response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
                 yield response
         else:
-            yield "Error: No model loaded. Check Ollama is running or HuggingFace auth."
+            yield "Error: No model loaded. Check Ollama is running (localhost:11434) or HuggingFace auth."
             
     def _get_wellness_system_prompt(self) -> str:
         """Get the wellness-optimized system prompt"""
@@ -276,7 +275,7 @@ You have access to 100+ wellness functions, quantum optimization, and full ecosy
 # Factory function for easy initialization
 def create_sofie_core_from_env() -> SofieCore:
     """Create SofieCore from environment variables"""
-    use_ollama = os.getenv("USE_OLLAMA", "false").lower() == "true"
+    use_ollama = os.getenv("USE_OLLAMA", "").lower() == "true"
     
     config = SofieConfig(
         use_ollama=use_ollama,
