@@ -31,6 +31,17 @@ SOFIE_SYSTEM = (
     "Keep replies under 40 words."
 )
 
+# Voice commands that trigger special actions (not LLM chat)
+SPECIAL_COMMANDS = {
+    "convene council": "council_convene",
+    "convene the council": "council_convene",
+    "council convene": "council_convene",
+    "wake council": "council_convene",
+    "status": "sofie_status",
+    "who am i": "identity_check",
+    "birth chart": "astro_chart"
+}
+
 audio_q = queue.Queue()
 listening = False
 speech_buffer = []
@@ -88,6 +99,81 @@ def ask_llama(prompt):
         traceback.print_exc()
         return "I'm here with you."
 
+def handle_special_command(command_type, original_text):
+    """
+    Handle special voice commands that trigger actions in sandironratio-node.
+    SOFIE has GOD mode - she can execute with supreme authority.
+    """
+    print(f"[SPECIAL COMMAND] {command_type}")
+    
+    if command_type == "council_convene":
+        speak("Convening the council. One moment.")
+        try:
+            # Call sandironratio-node to convene council
+            # Council will: search → revise → log to terracare_ledger
+            import urllib.request
+            import urllib.parse
+            
+            # Build command payload
+            payload = {
+                "command": "convene_council",
+                "god_mode": True,  # SOFIE has supreme authority
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "source": "sofie_voice",
+                "context": original_text
+            }
+            
+            data = j.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                "http://localhost:3000/api/admin/command",
+                data=data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            response = urllib.request.urlopen(req, timeout=10).read()
+            result = j.loads(response)
+            
+            if result.get("success"):
+                speak("The council is assembled. Six agents are now deliberating.")
+                return f"Council convened: {result.get('message', 'Active')}"
+            else:
+                speak("The council could not convene. Check the laboratory.")
+                return f"Error: {result.get('error', 'Unknown')}"
+                
+        except Exception as e:
+            print(f"ERROR convening council: {e}")
+            traceback.print_exc()
+            speak("I cannot reach the council. Ensure sandironratio node is running.")
+            return "Council unavailable"
+    
+    elif command_type == "sofie_status":
+        speak("All systems nominal. I am listening. The hive is active.")
+        return "Status: Active"
+    
+    elif command_type == "identity_check":
+        speak("You are Adrian Sortino. Born March 27, 1974 in Footscray, Victoria. The anagram is sandironratio.")
+        return "Identity: Adrian Sortino (sandironratio)"
+    
+    elif command_type == "astro_chart":
+        speak("Calculating your birth chart. Aries sun. Strong Mars influence.")
+        return "Chart calculated"
+    
+    return "Unknown command"
+
+def detect_special_command(text):
+    """
+    Check if text contains a special command.
+    Returns (command_type, remaining_text) or (None, text)
+    """
+    text_lower = text.lower().strip()
+    
+    for phrase, command_type in SPECIAL_COMMANDS.items():
+        if phrase in text_lower:
+            return (command_type, text)
+    
+    return (None, text)
+
+
 # === MAIN LOOP ===
 print("Available audio devices:")
 for i, dev in enumerate(sd.query_devices()):
@@ -136,8 +222,19 @@ with sd.InputStream(
             listening = False
 
             if question:
-                print("SENDING TO LLAMA:", question)
-                reply = ask_llama(question)
-                speak(reply)
+                print("PROCESSING:", question)
+                
+                # Check for special commands first
+                command_type, original = detect_special_command(question)
+                
+                if command_type:
+                    # Execute special command with GOD mode
+                    result = handle_special_command(command_type, original)
+                    print(f"COMMAND RESULT: {result}")
+                else:
+                    # Regular chat with LLaMA
+                    print("SENDING TO LLAMA:", question)
+                    reply = ask_llama(question)
+                    speak(reply)
             else:
                 speak("I'm listening.")
