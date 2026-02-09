@@ -21,7 +21,7 @@ VOICE_MODEL = r"C:\llama\voices\en_US-amy-medium.onnx"
 ESPEAK_DATA = r"C:\llama\piper\espeak-ng-data"
 OUTPUT_WAV = r"C:\llama\service\sofie.wav"
 LLAMA_URL = "http://127.0.0.1:11434/api/chat"  # Ollama API endpoint
-SILENCE_SEC = 3.0  # Longer pause allows complete sentences without cutoff
+SILENCE_SEC = 6.0  # Much longer pause - prevents cutting off natural speech
 LIB_PATH = r"C:\llama\library\frequency.txt"
 
 SOFIE_SYSTEM = (
@@ -54,17 +54,24 @@ def audio_callback(indata, frames, time_info, status):
 
 def speak(text):
     print("S.O.F.I.E.:", text)
-    subprocess.run([
-        PIPER_EXE,
-        "--model", VOICE_MODEL,
-        "--espeak_data", ESPEAK_DATA,
-        "--output_file", OUTPUT_WAV,
-        "--text", text
-    ], check=True)
-    subprocess.run([
-        "powershell", "-c",
-        f"(New-Object Media.SoundPlayer '{OUTPUT_WAV}').PlaySync()"
-    ], check=True)
+    try:
+        # Generate speech with Piper
+        result = subprocess.run([
+            PIPER_EXE,
+            "--model", VOICE_MODEL,
+            "--espeak_data", ESPEAK_DATA,
+            "--output_file", OUTPUT_WAV,
+            "--text", text
+        ], check=True, capture_output=True)
+        
+        # Play the audio
+        subprocess.run([
+            "powershell", "-c",
+            f"(New-Object Media.SoundPlayer '{OUTPUT_WAV}').PlaySync()"
+        ], check=True)
+    except Exception as e:
+        print(f"[WARNING] Voice synthesis failed: {e}")
+        print(f"[WARNING] Check Piper paths: {PIPER_EXE}, {VOICE_MODEL}")
 
 def load_freq_snippet():
     try:
