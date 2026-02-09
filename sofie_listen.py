@@ -20,8 +20,8 @@ PIPER_EXE = r"C:\llama\piper\piper.exe"
 VOICE_MODEL = r"C:\llama\voices\en_US-amy-medium.onnx"
 ESPEAK_DATA = r"C:\llama\piper\espeak-ng-data"
 OUTPUT_WAV = r"C:\llama\service\sofie.wav"
-LLAMA_URL = "http://127.0.0.1:8080/v1/chat/completions"
-SILENCE_SEC = 1.5
+LLAMA_URL = "http://127.0.0.1:11434/api/chat"  # Ollama API endpoint
+SILENCE_SEC = 3.0  # Longer pause allows complete sentences without cutoff
 LIB_PATH = r"C:\llama\library\frequency.txt"
 
 SOFIE_SYSTEM = (
@@ -80,12 +80,16 @@ def ask_llama(prompt):
         if freq_line:
             prompt += f"\n\nFrequency bridge: {freq_line}"
         payload = {
+            "model": "llama3.1:8b",
             "messages": [
                 {"role": "system", "content": SOFIE_SYSTEM},
                 {"role": "user", "content": prompt}
             ],
-            "max_tokens": 80,
-            "temperature": 0.7
+            "stream": False,
+            "options": {
+                "temperature": 0.7,
+                "num_predict": 80
+            }
         }
         data = j.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
@@ -93,7 +97,8 @@ def ask_llama(prompt):
             headers={"Content-Type": "application/json"}
         )
         raw = urllib.request.urlopen(req, timeout=20).read()
-        return j.loads(raw)["choices"][0]["message"]["content"].strip()
+        response = j.loads(raw)
+        return response["message"]["content"].strip()
     except Exception as e:
         print("ERROR contacting LLM:", e)
         traceback.print_exc()
